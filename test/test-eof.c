@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2000-2007 Niels Provos <provos@citi.umich.edu>
+ * Copyright (c) 2002-2007 Niels Provos <provos@citi.umich.edu>
  * Copyright (c) 2007-2012 Niels Provos and Nick Mathewson
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,62 +24,94 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _EVENT_H_
-#define _EVENT_H_
+#include "../util-internal.h"
+#include "event2/event-config.h"
 
-/** @file event.h
-
-  A library for writing event-driven network servers.
-
-  The <event.h> header is deprecated in Libevent 2.0 and later; please
-  use <event2/event.h> instead.  Depending on what functionality you
-  need, you may also want to include more of the other event2/
-  headers.
- */
-
-#ifdef __cplusplus
-extern "C" {
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <unistd.h>
 #endif
-
-#include <event2/event-config.h>
-#ifdef _EVENT_HAVE_SYS_TYPES_H
 #include <sys/types.h>
-#endif
-#ifdef _EVENT_HAVE_SYS_TIME_H
+#include <sys/stat.h>
+#ifdef EVENT__HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
-#ifdef _EVENT_HAVE_STDINT_H
-#include <stdint.h>
+#ifdef EVENT__HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
 #endif
-#include <stdarg.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
-/* For int types. */
+#include <event.h>
 #include <evutil.h>
 
-#ifdef WIN32
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <winsock2.h>
-#include <windows.h>
-#undef WIN32_LEAN_AND_MEAN
-typedef unsigned char u_char;
-typedef unsigned short u_short;
-#endif
+int test_okay = 1;
+int called = 0;
+struct timeval timeout = {60, 0};
 
-#include <event2/event_struct.h>
-#include <event2/event.h>
-#include <event2/event_compat.h>
-#include <event2/buffer.h>
-#include <event2/buffer_compat.h>
-#include <event2/bufferevent.h>
-#include <event2/bufferevent_struct.h>
-#include <event2/bufferevent_compat.h>
-#include <event2/tag.h>
-#include <event2/tag_compat.h>
+static void
+read_cb(evutil_socket_t fd, short event, void *arg)
+{
+	char buf[256];
+	int len;
 
-#ifdef __cplusplus
+	if (EV_TIMEOUT & event) {
+		printf("%s: Timeout!\n", __func__);
+		exit(1);
+	}
+
+	len = recv(fd, buf, sizeof(buf), 0);
+
+	printf("%s: read %d%s\n", __func__,
+	    len, len ? "" : " - means EOF");
+
+	if (len) {
+		if (!called)
+			event_add(arg, &timeout);
+	} else if (called == 1)
+		test_okay = 0;
+
+	called++;
 }
+
+int
+main(int argc, char **argv)
+{
+	struct event ev;
+	const char *test = "test string";
+	evutil_socket_t pair[2];
+
+#ifdef _WIN32
+	WORD wVersionRequested;
+	WSADATA wsaData;
+
+	wVersionRequested = MAKEWORD(2, 2);
+
+	(void) WSAStartup(wVersionRequested, &wsaData);
 #endif
 
-#endif /* _EVENT_H_ */
+	if (evutil_socketpair(AF_UNIX, SOCK_STREAM, 0, pair) == -1)
+		return (1);
+
+
+	if (send(pair[0], test, (int)strlen(test)+1, 0) < 0)
+		return (1);
+	shutdown(pair[0], EVUTIL_SHUT_WR);
+
+	/* Initalize the event library */
+	event_init();
+
+	/* Initalize one event */
+	event_set(&ev, pair[1], EV_READ | EV_TIMEOUT, read_cb, &ev);
+
+	event_add(&ev, &timeout);
+
+	event_dispatch();
+
+	return (test_okay);
+}
+
