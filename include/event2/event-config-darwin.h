@@ -41,6 +41,9 @@
 /* Define if libevent should not be compiled with thread support */
 /* #undef EVENT__DISABLE_THREAD_SUPPORT */
 
+/* Define to 1 if you have the `accept4' function. */
+/* #undef EVENT__HAVE_ACCEPT4 */
+
 /* Define to 1 if you have the `arc4random' function. */
 #define EVENT__HAVE_ARC4RANDOM 1
 
@@ -78,8 +81,17 @@
 /* Define if your system supports the epoll system calls */
 /* #undef EVENT__HAVE_EPOLL */
 
+/* Define to 1 if you have the `epoll_create1' function. */
+/* #undef EVENT__HAVE_EPOLL_CREATE1 */
+
 /* Define to 1 if you have the `epoll_ctl' function. */
 /* #undef EVENT__HAVE_EPOLL_CTL */
+
+/* Define to 1 if you have the <errno.h> header file. */
+#define EVENT__HAVE_ERRNO_H 1
+
+/* Define to 1 if you have ERR_remove_thread_stat(). */
+/* #undef EVENT__HAVE_ERR_REMOVE_THREAD_STATE */
 
 /* Define to 1 if you have the `eventfd' function. */
 /* #undef EVENT__HAVE_EVENTFD */
@@ -117,6 +129,9 @@
 /* Define this if gethostbyname_r takes 6 arguments */
 /* #undef EVENT__HAVE_GETHOSTBYNAME_R_6_ARG */
 
+/* Define to 1 if you have the `getifaddrs' function. */
+#define EVENT__HAVE_GETIFADDRS 1
+
 /* Define to 1 if you have the `getnameinfo' function. */
 #define EVENT__HAVE_GETNAMEINFO 1
 
@@ -129,8 +144,8 @@
 /* Define to 1 if you have the `gettimeofday' function. */
 #define EVENT__HAVE_GETTIMEOFDAY 1
 
-/* Define to 1 if you have the `inet_aton' function. */
-#define EVENT__HAVE_INET_ATON 1
+/* Define to 1 if you have the <ifaddrs.h> header file. */
+#define EVENT__HAVE_IFADDRS_H 1
 
 /* Define to 1 if you have the `inet_ntop' function. */
 #define EVENT__HAVE_INET_NTOP 1
@@ -150,11 +165,20 @@
 /* Define if the system has zlib */
 #define EVENT__HAVE_LIBZ 1
 
+/* Define to 1 if you have the `mach_absolute_time' function. */
+#define HAVE_MACH_ABSOLUTE_TIME 1
+
+/* Define to 1 if you have the <mach/mach_time.h> header file. */
+#define HAVE_MACH_MACH_TIME_H 1
+
 /* Define to 1 if you have the <memory.h> header file. */
 #define EVENT__HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `mmap' function. */
 #define EVENT__HAVE_MMAP 1
+
+/* Define to 1 if you have the `nanosleep' function. */
+#define HAVE_NANOSLEEP 1
 
 /* Define to 1 if you have the <netdb.h> header file. */
 #define EVENT__HAVE_NETDB_H 1
@@ -165,14 +189,17 @@
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #define EVENT__HAVE_NETINET_IN_H 1
 
+/* Define to 1 if you have the <netinet/tcp.h> header file. */
+#define HAVE_NETINET_TCP_H 1
+
 /* Define if the system has openssl */
 #define EVENT__HAVE_OPENSSL 1
 
-/* Define to 1 if you have the <openssl/bio.h> header file. */
-#define EVENT__HAVE_OPENSSL_BIO_H 1
-
 /* Define to 1 if you have the `pipe' function. */
 #define EVENT__HAVE_PIPE 1
+
+/* Define to 1 if you have the `pipe2' function. */
+/* #undef EVENT__HAVE_PIPE2 */
 
 /* Define to 1 if you have the `poll' function. */
 #define EVENT__HAVE_POLL 1
@@ -209,6 +236,9 @@
 
 /* Define if F_SETFD is defined in <fcntl.h> */
 #define EVENT__HAVE_SETFD 1
+
+/* Define to 1 if you have the `setrlimit' function. */
+#define EVENT__HAVE_SETRLIMIT 1
 
 /* Define to 1 if you have the `sigaction' function. */
 #define EVENT__HAVE_SIGACTION 1
@@ -279,6 +309,9 @@
 /* Define to 1 if `__ss_family' is a member of `struct sockaddr_storage'. */
 /* #undef EVENT__HAVE_STRUCT_SOCKADDR_STORAGE___SS_FAMILY */
 
+/* Define to 1 if the system has the type `struct so_linger'. */
+#define HAVE_STRUCT_SO_LINGER 1
+
 /* Define to 1 if you have the `sysctl' function. */
 #define EVENT__HAVE_SYSCTL 1
 
@@ -306,6 +339,9 @@
 /* Define to 1 if you have the <sys/queue.h> header file. */
 #define EVENT__HAVE_SYS_QUEUE_H 1
 
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#define EVENT__HAVE_SYS_RESOURCE_H 1
+
 /* Define to 1 if you have the <sys/select.h> header file. */
 #define EVENT__HAVE_SYS_SELECT_H 1
 
@@ -320,6 +356,9 @@
 
 /* Define to 1 if you have the <sys/sysctl.h> header file. */
 #define EVENT__HAVE_SYS_SYSCTL_H 1
+
+/* Define to 1 if you have the <sys/timerfd.h> header file. */
+#define EVENT__HAVE_SYS_TIMERFD_H 1
 
 /* Define to 1 if you have the <sys/time.h> header file. */
 #define EVENT__HAVE_SYS_TIME_H 1
@@ -344,6 +383,9 @@
 
 /* Define if timercmp is defined in <sys/time.h> */
 #define EVENT__HAVE_TIMERCMP 1
+
+/* Define to 1 if you have the `timerfd_create' function. */
+#define EVENT__HAVE_TIMERFD_CREATE 1
 
 /* Define if timerisset is defined in <sys/time.h> */
 #define EVENT__HAVE_TIMERISSET 1
@@ -372,8 +414,14 @@
 /* Define to 1 if you have the `unsetenv' function. */
 #define EVENT__HAVE_UNSETENV 1
 
+/* Define to 1 if you have the `usleep' function. */
+#define EVENT__HAVE_USLEEP 1
+
 /* Define to 1 if you have the `vasprintf' function. */
 #define EVENT__HAVE_VASPRINTF 1
+
+/* Define if waitpid() supports WNOWAIT */
+/* #undef EVENT__HAVE_WAITPID_WITH_WNOWAIT */
 
 /* Define if kqueue works correctly with pipes */
 #define EVENT__HAVE_WORKING_KQUEUE 1
