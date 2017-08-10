@@ -36,8 +36,6 @@ cc_library {
     ],
     export_include_dirs: ["include"],
 
-    local_include_dirs: ["compat"],
-
     srcs: [
         // core
         "buffer.c",
@@ -51,7 +49,6 @@ cc_library {
         "evthread.c",
         "evutil.c",
         "evutil_rand.c",
-        "evutil_time.c",
         "listener.c",
         "log.c",
         "signal.c",
