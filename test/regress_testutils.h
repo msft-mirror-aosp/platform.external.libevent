@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2000-2007 Niels Provos <provos@citi.umich.edu>
- * Copyright (c) 2007-2012 Niels Provos and Nick Mathewson
+ * Copyright (c) 2010-2012 Niels Provos and Nick Mathewson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,22 +23,45 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _EVDNS_H_
-#define _EVDNS_H_
 
-/** @file evdns.h
+#ifndef REGRESS_TESTUTILS_H_INCLUDED_
+#define REGRESS_TESTUTILS_H_INCLUDED_
 
-  A dns subsystem for Libevent.
+#include "event2/dns.h"
 
-  The <evdns.h> header is deprecated in Libevent 2.0 and later; please
-  use <event2/evdns.h> instead.  Depending on what functionality you
-  need, you may also want to include more of the other <event2/...>
-  headers.
- */
+struct regress_dns_server_table {
+	const char *q;
+	const char *anstype;
+	const char *ans;
+	int seen;
+	int lower;
+};
 
-#include <event.h>
-#include <event2/dns.h>
-#include <event2/dns_compat.h>
-#include <event2/dns_struct.h>
+struct evdns_server_port *
+regress_get_dnsserver(struct event_base *base,
+    ev_uint16_t *portnum,
+    evutil_socket_t *psock,
+    evdns_request_callback_fn_type cb,
+    void *arg);
 
-#endif /* _EVDNS_H_ */
+/* Helper: return the port that a socket is bound on, in host order. */
+int regress_get_socket_port(evutil_socket_t fd);
+
+/* used to look up pre-canned responses in a search table */
+void regress_dns_server_cb(
+	struct evdns_server_request *req, void *data);
+
+/* globally allocates a dns server that serves from a search table */
+int regress_dnsserver(struct event_base *base, ev_uint16_t *port,
+    struct regress_dns_server_table *seach_table);
+
+/* clean up the global dns server resources */
+void regress_clean_dnsserver(void);
+
+struct evconnlistener;
+struct sockaddr;
+int regress_get_listener_addr(struct evconnlistener *lev,
+    struct sockaddr *sa, ev_socklen_t *socklen);
+
+#endif /* REGRESS_TESTUTILS_H_INCLUDED_ */
+
