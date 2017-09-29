@@ -73,7 +73,6 @@ cc_library {
         },
         linux: {
             srcs: ["epoll.c"],
-            host_ldlibs: ["-lrt"],
         },
         linux_bionic: {
             enabled: true,
