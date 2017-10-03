@@ -71,7 +71,7 @@ cc_library {
         android: {
             srcs: ["epoll.c"],
         },
-        linux: {
+        linux_glibc: {
             srcs: ["epoll.c"],
         },
         linux_bionic: {
