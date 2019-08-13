@@ -7,13 +7,13 @@ third_party {
   }
   url {
     type: ARCHIVE
-    value: "https://github.com/libevent/libevent/releases/download/release-2.1.10-stable/libevent-2.1.10-stable.tar.gz"
+    value: "https://github.com/libevent/libevent/releases/download/release-2.1.11-stable/libevent-2.1.11-stable.tar.gz"
   }
-  version: "release-2.1.10-stable"
+  version: "release-2.1.11-stable"
   license_type: RECIPROCAL
   last_upgrade_date {
     year: 2019
-    month: 5
-    day: 31
+    month: 8
+    day: 1
   }
 }
