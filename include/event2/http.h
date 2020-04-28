@@ -78,8 +78,7 @@ struct evdns_base;
  * Create a new HTTP server.
  *
  * @param base (optional) the event base to receive the HTTP events
- * @return a pointer to a newly initialized evhttp server structure or NULL
- *   on error
+ * @return a pointer to a newly initialized evhttp server structure
  * @see evhttp_free()
  */
 EVENT2_EXPORT_SYMBOL
@@ -517,8 +516,7 @@ enum evhttp_request_kind { EVHTTP_REQUEST, EVHTTP_RESPONSE };
  *     when the connection closes.  It must have no fd set on it.
  * @param address the address to which to connect
  * @param port the port to connect to
- * @return an evhttp_connection object that can be used for making requests or
- *   NULL on error
+ * @return an evhttp_connection object that can be used for making requests
  */
 EVENT2_EXPORT_SYMBOL
 struct evhttp_connection *evhttp_connection_base_bufferevent_new(
@@ -638,8 +636,7 @@ void evhttp_request_free(struct evhttp_request *req);
  *     specified host name resolution will block.
  * @param address the address to which to connect
  * @param port the port to connect to
- * @return an evhttp_connection object that can be used for making requests or
- *   NULL on error
+ * @return an evhttp_connection object that can be used for making requests
  */
 EVENT2_EXPORT_SYMBOL
 struct evhttp_connection *evhttp_connection_base_new(
@@ -930,14 +927,14 @@ char *evhttp_uriencode(const char *str, ev_ssize_t size, int space_to_plus);
 
 /**
   Helper function to sort of decode a URI-encoded string.  Unlike
-  evhttp_uridecode, it decodes all plus characters that appear
+  evhttp_get_decoded_uri, it decodes all plus characters that appear
   _after_ the first question mark character, but no plusses that occur
   before.  This is not a good way to decode URIs in whole or in part.
 
   The returned string must be freed by the caller
 
   @deprecated  This function is deprecated; you probably want to use
-     evhttp_uridecode instead.
+     evhttp_get_decoded_uri instead.
 
   @param uri an encoded URI
   @return a newly allocated unencoded URI or NULL on failure

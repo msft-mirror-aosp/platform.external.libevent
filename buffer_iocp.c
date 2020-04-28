@@ -44,7 +44,6 @@
 #include "mm-internal.h"
 
 #include <winsock2.h>
-#include <winerror.h>
 #include <windows.h>
 #include <stdio.h>
 

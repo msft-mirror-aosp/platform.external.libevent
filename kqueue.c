@@ -37,7 +37,6 @@
 #endif
 #include <sys/queue.h>
 #include <sys/event.h>
-#include <limits.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +62,6 @@
 #include "log-internal.h"
 #include "evmap-internal.h"
 #include "event2/thread.h"
-#include "event2/util.h"
 #include "evthread-internal.h"
 #include "changelist-internal.h"
 
@@ -209,17 +207,9 @@ kq_build_changes_list(const struct event_changelist *changelist,
 		struct event_change *in_ch = &changelist->changes[i];
 		struct kevent *out_ch;
 		if (n_changes >= kqop->changes_size - 1) {
-			int newsize;
+			int newsize = kqop->changes_size * 2;
 			struct kevent *newchanges;
 
-			if (kqop->changes_size > INT_MAX / 2 ||
-			    (size_t)kqop->changes_size * 2 > EV_SIZE_MAX /
-			    sizeof(struct kevent)) {
-				event_warnx("%s: int overflow", __func__);
-				return (-1);
-			}
-
-			newsize = kqop->changes_size * 2;
 			newchanges = mm_realloc(kqop->changes,
 			    newsize * sizeof(struct kevent));
 			if (newchanges == NULL) {

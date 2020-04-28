@@ -43,7 +43,6 @@ extern struct testcase_t bufferevent_iocp_testcases[];
 extern struct testcase_t util_testcases[];
 extern struct testcase_t signal_testcases[];
 extern struct testcase_t http_testcases[];
-extern struct testcase_t http_iocp_testcases[];
 extern struct testcase_t dns_testcases[];
 extern struct testcase_t rpc_testcases[];
 extern struct testcase_t edgetriggered_testcases[];
@@ -133,13 +132,10 @@ pid_t regress_fork(void);
 #ifdef EVENT__HAVE_OPENSSL
 #include <openssl/ssl.h>
 EVP_PKEY *ssl_getkey(void);
-X509 *ssl_getcert(EVP_PKEY *key);
+X509 *ssl_getcert(void);
 SSL_CTX *get_ssl_ctx(void);
 void init_ssl(void);
 #endif
-
-void * basic_test_setup(const struct testcase_t *testcase);
-int    basic_test_cleanup(const struct testcase_t *testcase, void *ptr);
 
 #ifdef __cplusplus
 }

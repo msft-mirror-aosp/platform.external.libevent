@@ -54,7 +54,6 @@
 #ifdef _WIN32
 #include <wincrypt.h>
 #include <process.h>
-#include <winerror.h>
 #else
 #include <fcntl.h>
 #include <unistd.h>
@@ -90,6 +89,7 @@ static int rs_initialized;
 static struct arc4_stream rs;
 static pid_t arc4_stir_pid;
 static int arc4_count;
+static int arc4_seeded_ok;
 
 static inline unsigned char arc4_getbyte(void);
 
@@ -163,6 +163,7 @@ arc4_seed_win32(void)
 		return -1;
 	arc4_addrandom(buf, sizeof(buf));
 	evutil_memclear_(buf, sizeof(buf));
+	arc4_seeded_ok = 1;
 	return 0;
 }
 #endif
@@ -200,6 +201,7 @@ arc4_seed_sysctl_linux(void)
 
 	arc4_addrandom(buf, sizeof(buf));
 	evutil_memclear_(buf, sizeof(buf));
+	arc4_seeded_ok = 1;
 	return 0;
 }
 #endif
@@ -239,6 +241,7 @@ arc4_seed_sysctl_bsd(void)
 
 	arc4_addrandom(buf, sizeof(buf));
 	evutil_memclear_(buf, sizeof(buf));
+	arc4_seeded_ok = 1;
 	return 0;
 }
 #endif
@@ -284,6 +287,7 @@ arc4_seed_proc_sys_kernel_random_uuid(void)
 	}
 	evutil_memclear_(entropy, sizeof(entropy));
 	evutil_memclear_(buf, sizeof(buf));
+	arc4_seeded_ok = 1;
 	return 0;
 }
 #endif
@@ -307,6 +311,7 @@ static int arc4_seed_urandom_helper_(const char *fname)
 		return -1;
 	arc4_addrandom(buf, sizeof(buf));
 	evutil_memclear_(buf, sizeof(buf));
+	arc4_seeded_ok = 1;
 	return 0;
 }
 
@@ -374,7 +379,8 @@ arc4_stir(void)
 		rs_initialized = 1;
 	}
 
-	if (0 != arc4_seed())
+	arc4_seed();
+	if (!arc4_seeded_ok)
 		return -1;
 
 	/*

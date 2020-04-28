@@ -78,8 +78,6 @@ gai_callback(int err, struct evutil_addrinfo *ai, void *arg)
 {
 	const char *name = arg;
 	int i;
-	struct evutil_addrinfo *first_ai = ai;
-
 	if (err) {
 		printf("%s: %s\n", name, evutil_gai_strerror(err));
 	}
@@ -101,9 +99,6 @@ gai_callback(int err, struct evutil_addrinfo *ai, void *arg)
 			printf("[%d] %s: %s\n",i,name,buf);
 		}
 	}
-
-	if (first_ai)
-		evutil_freeaddrinfo(first_ai);
 }
 
 static void
@@ -159,19 +154,19 @@ main(int c, char **v) {
 		const char *ns;
 	};
 	struct options o;
-	int opt;
+	char opt;
 	struct event_base *event_base = NULL;
 	struct evdns_base *evdns_base = NULL;
 
 	memset(&o, 0, sizeof(o));
-
+	
 	if (c < 2) {
 		fprintf(stderr, "syntax: %s [-x] [-v] [-c resolv.conf] [-s ns] hostname\n", v[0]);
 		fprintf(stderr, "syntax: %s [-T]\n", v[0]);
 		return 1;
 	}
 
-	while ((opt = getopt(c, v, "xvc:Ts:g")) != -1) {
+	while ((opt = getopt(c, v, "xvc:Ts:")) != -1) {
 		switch (opt) {
 			case 'x': o.reverse = 1; break;
 			case 'v': ++verbose; break;
@@ -257,8 +252,6 @@ main(int c, char **v) {
 	}
 	fflush(stdout);
 	event_base_dispatch(event_base);
-	evdns_base_free(evdns_base, 1);
-	event_base_free(event_base);
 	return 0;
 }
 

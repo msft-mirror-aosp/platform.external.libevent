@@ -34,7 +34,6 @@
  */
 
 #include "event2/event-config.h"
-#include "../util-internal.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -65,8 +64,7 @@
 #include <event.h>
 #include <evutil.h>
 
-static ev_ssize_t count, fired;
-static int writes, failures;
+static int count, writes, fired, failures;
 static evutil_socket_t *pipes;
 static int num_pipes, num_active, num_writes;
 static struct event *events;
@@ -119,18 +117,15 @@ run_once(void)
 
 	count = 0;
 	writes = num_writes;
-	{
-		int xcount = 0;
-		evutil_gettimeofday(&ts, NULL);
-		do {
-			event_loop(EVLOOP_ONCE | EVLOOP_NONBLOCK);
-			xcount++;
-		} while (count != fired);
-		evutil_gettimeofday(&te, NULL);
+	{ int xcount = 0;
+	evutil_gettimeofday(&ts, NULL);
+	do {
+		event_loop(EVLOOP_ONCE | EVLOOP_NONBLOCK);
+		xcount++;
+	} while (count != fired);
+	evutil_gettimeofday(&te, NULL);
 
-		if (xcount != count)
-			fprintf(stderr, "Xcount: %d, Rcount: " EV_SSIZE_FMT "\n",
-				xcount, count);
+	if (xcount != count) fprintf(stderr, "Xcount: %d, Rcount: %d\n", xcount, count);
 	}
 
 	evutil_timersub(&te, &ts, &te);
@@ -141,7 +136,7 @@ run_once(void)
 int
 main(int argc, char **argv)
 {
-#ifdef EVENT__HAVE_SETRLIMIT
+#ifdef HAVE_SETRLIMIT 
 	struct rlimit rl;
 #endif
 	int i, c;
@@ -172,7 +167,7 @@ main(int argc, char **argv)
 		}
 	}
 
-#ifdef EVENT__HAVE_SETRLIMIT
+#ifdef HAVE_SETRLIMIT
 	rl.rlim_cur = rl.rlim_max = num_pipes * 2 + 50;
 	if (setrlimit(RLIMIT_NOFILE, &rl) == -1) {
 		perror("setrlimit");

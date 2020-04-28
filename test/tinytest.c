@@ -61,12 +61,6 @@
 
 #define LONGEST_TEST_NAME 16384
 
-#ifndef _WIN32
-#define DEFAULT_TESTCASE_TIMEOUT 30U
-#else
-#define DEFAULT_TESTCASE_TIMEOUT 0U
-#endif
-
 static int in_tinytest_main = 0; /**< true if we're in tinytest_main().*/
 static int n_ok = 0; /**< Number of tests that have passed */
 static int n_bad = 0; /**< Number of tests that have failed. */
@@ -75,7 +69,6 @@ static int n_skipped = 0; /**< Number of tests that have been skipped. */
 static int opt_forked = 0; /**< True iff we're called from inside a win32 fork*/
 static int opt_nofork = 0; /**< Suppress calls to fork() for debugging. */
 static int opt_verbosity = 1; /**< -==quiet,0==terse,1==normal,2==verbose */
-static unsigned int opt_timeout = DEFAULT_TESTCASE_TIMEOUT; /**< Timeout for every test (using alarm()) */
 const char *verbosity_flag = "";
 
 const struct testlist_alias_t *cfg_aliases=NULL;
@@ -95,25 +88,6 @@ static void usage(struct testgroup_t *groups, int list_groups)
   __attribute__((noreturn));
 static int process_test_option(struct testgroup_t *groups, const char *test);
 
-static unsigned int testcase_set_timeout_(void)
-{
-	if (!opt_timeout)
-		return 0;
-#ifndef _WIN32
-	return alarm(opt_timeout);
-#else
-	/** TODO: win32 support */
-	fprintf(stderr, "You cannot set alarm on windows\n");
-	exit(1);
-#endif
-}
-static unsigned int testcase_reset_timeout_(void)
-{
-#ifndef _WIN32
-	return alarm(0);
-#endif
-}
-
 static enum outcome
 testcase_run_bare_(const struct testcase_t *testcase)
 {
@@ -128,11 +102,7 @@ testcase_run_bare_(const struct testcase_t *testcase)
 	}
 
 	cur_test_outcome = OK;
-	{
-		testcase_set_timeout_();
-		testcase->fn(env);
-		testcase_reset_timeout_();
-	}
+	testcase->fn(env);
 	outcome = cur_test_outcome;
 
 	if (testcase->setup) {
@@ -283,12 +253,15 @@ testcase_run_one(const struct testgroup_t *group,
 	}
 
 	if (outcome == OK) {
+		++n_ok;
 		if (opt_verbosity>0 && !opt_forked)
 			puts(opt_verbosity==1?"OK":"");
 	} else if (outcome == SKIP) {
+		++n_skipped;
 		if (opt_verbosity>0 && !opt_forked)
 			puts("SKIPPED");
 	} else {
+		++n_bad;
 		if (!opt_forked)
 			printf("\n  [%s FAILED]\n", testcase->name);
 	}
@@ -339,7 +312,7 @@ tinytest_set_flag_(struct testgroup_t *groups, const char *arg, int set, unsigne
 static void
 usage(struct testgroup_t *groups, int list_groups)
 {
-	puts("Options are: [--verbose|--quiet|--terse] [--no-fork] [--timeout <sec>]");
+	puts("Options are: [--verbose|--quiet|--terse] [--no-fork]");
 	puts("  Specify tests by name, or using a prefix ending with '..'");
 	puts("  To skip a test, prefix its name with a colon.");
 	puts("  To enable a disabled test, prefix its name with a plus.");
@@ -436,15 +409,8 @@ tinytest_main(int c, const char **v, struct testgroup_t *groups)
 				usage(groups, 0);
 			} else if (!strcmp(v[i], "--list-tests")) {
 				usage(groups, 1);
-			} else if (!strcmp(v[i], "--timeout")) {
-				++i;
-				if (i >= c) {
-					fprintf(stderr, "--timeout requires argument\n");
-					return -1;
-				}
-				opt_timeout = (unsigned)atoi(v[i]);
 			} else {
-				fprintf(stderr, "Unknown option %s. Try --help\n", v[i]);
+				printf("Unknown option %s.  Try --help\n",v[i]);
 				return -1;
 			}
 		} else {
@@ -462,35 +428,11 @@ tinytest_main(int c, const char **v, struct testgroup_t *groups)
 #endif
 
 	++in_tinytest_main;
-	for (i = 0; groups[i].prefix; ++i) {
-		struct testgroup_t *group = &groups[i];
-		for (j = 0; group->cases[j].name; ++j) {
-			struct testcase_t *testcase = &group->cases[j];
-			int test_attempts = 3;
-			int test_ret_err;
-
-			if (!(testcase->flags & TT_ENABLED_))
-				continue;
-
-			for (;;) {
-				test_ret_err = testcase_run_one(group, testcase);
-
-				if (test_ret_err == OK)
-					break;
-				if (!(testcase->flags & TT_RETRIABLE))
-					break;
-				printf("\n  [RETRYING %s (%i)]\n", testcase->name, test_attempts);
-				if (!test_attempts--)
-					break;
-			}
-
-			switch (test_ret_err) {
-				case OK:   ++n_ok;      break;
-				case SKIP: ++n_skipped; break;
-				default:   ++n_bad;     break;
-			}
-		}
-	}
+	for (i=0; groups[i].prefix; ++i)
+		for (j=0; groups[i].cases[j].name; ++j)
+			if (groups[i].cases[j].flags & TT_ENABLED_)
+				testcase_run_one(&groups[i],
+						 &groups[i].cases[j]);
 
 	--in_tinytest_main;
 

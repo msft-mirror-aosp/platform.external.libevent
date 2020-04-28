@@ -329,8 +329,7 @@ evrpc_request_cb(struct evhttp_request *req, void *arg)
 	return;
 
 error:
-	if (rpc_state)
-		evrpc_reqstate_free_(rpc_state);
+	evrpc_reqstate_free_(rpc_state);
 	evhttp_send_error(req, HTTP_SERVUNAVAIL, NULL);
 	return;
 }
@@ -892,7 +891,8 @@ evrpc_reply_done(struct evhttp_request *req, void *arg)
 			 * layer is going to free it.  we need to
 			 * request ownership explicitly
 			 */
-			evhttp_request_own(req);
+			if (req != NULL)
+				evhttp_request_own(req);
 
 			evrpc_pause_request(pool, ctx,
 			    evrpc_reply_done_closure);

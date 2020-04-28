@@ -100,9 +100,6 @@ main(int argc, char **argv)
 
 	evutil_gettimeofday(&lasttime, NULL);
 
-	setbuf(stdout, NULL);
-	setbuf(stderr, NULL);
-
 	event_base_dispatch(base);
 
 	return (0);
