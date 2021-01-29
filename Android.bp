@@ -17,6 +17,7 @@ cc_library {
     host_supported: true,
     recovery_available: true,
     vendor_available: true,
+    product_available: true,
     vndk: {
         enabled: true,
     },
@@ -50,6 +51,7 @@ cc_library {
         "event.c",
         "evmap.c",
         "evthread.c",
+        "evthread_pthread.c",
         "evutil.c",
         "evutil_rand.c",
         "evutil_time.c",
