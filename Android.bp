@@ -116,4 +116,5 @@ cc_library {
             srcs: ["kqueue.c"],
         },
     },
+    min_sdk_version: "30",
 }
