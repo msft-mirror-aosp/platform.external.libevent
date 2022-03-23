@@ -49,7 +49,6 @@ license {
 cc_library {
     name: "libevent",
     host_supported: true,
-    ramdisk_available: true,
     recovery_available: true,
     vendor_available: true,
     product_available: true,
@@ -116,9 +115,4 @@ cc_library {
             srcs: ["kqueue.c"],
         },
     },
-    min_sdk_version: "30",
-    apex_available: [
-        "//apex_available:platform",
-        "com.android.bluetooth",
-    ],
 }
