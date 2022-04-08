@@ -987,6 +987,12 @@ event_reinit(struct event_base *base)
 
 	EVBASE_ACQUIRE_LOCK(base, th_base_lock);
 
+	if (base->running_loop) {
+		event_warnx("%s: forked from the event_loop.", __func__);
+		res = -1;
+		goto done;
+	}
+
 	evsel = base->evsel;
 
 	/* check if this event mechanism requires reinit on the backend */
@@ -1706,8 +1712,8 @@ event_process_active_single_queue(struct event_base *base,
 			evcb_evfinalize = ev->ev_evcallback.evcb_cb_union.evcb_evfinalize;
 			EVUTIL_ASSERT((evcb->evcb_flags & EVLIST_FINALIZING));
 			EVBASE_RELEASE_LOCK(base, th_base_lock);
-			event_debug_note_teardown_(ev);
 			evcb_evfinalize(ev, ev->ev_arg);
+			event_debug_note_teardown_(ev);
 			if (evcb_closure == EV_CLOSURE_EVENT_FINALIZE_FREE)
 				mm_free(ev);
 		}
@@ -2055,9 +2061,6 @@ event_base_once(struct event_base *base, evutil_socket_t fd, short events,
 	struct event_once *eonce;
 	int res = 0;
 	int activate = 0;
-
-	if (!base)
-		return (-1);
 
 	/* We cannot support signals that just fire once, or persistent
 	 * events. */

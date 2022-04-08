@@ -88,10 +88,10 @@ main(int argc, char **argv)
 		flags = 0;
 	}
 
-	/* Initialize the event library */
+	/* Initalize the event library */
 	base = event_base_new();
 
-	/* Initialize one event */
+	/* Initalize one event */
 	event_assign(&timeout, base, -1, flags, timeout_cb, (void*) &timeout);
 
 	evutil_timerclear(&tv);
