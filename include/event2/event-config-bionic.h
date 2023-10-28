@@ -464,6 +464,27 @@
    your system. */
 /* #undef EVENT__PTHREAD_CREATE_JOINABLE */
 
+/* The size of `int', as computed by sizeof. */
+#define EVENT__SIZEOF_INT 4
+
+/* The size of `long', as computed by sizeof. */
+#define EVENT__SIZEOF_LONG EVENT__SIZEOF_SIZE_T
+
+/* The size of `long long', as computed by sizeof. */
+#define EVENT__SIZEOF_LONG_LONG 8
+
+/* The size of `off_t', as computed by sizeof. */
+#define EVENT__SIZEOF_OFF_T EVENT__SIZEOF_SIZE_T
+
+/* The size of `pthread_t', as computed by sizeof. */
+#define EVENT__SIZEOF_PTHREAD_T EVENT__SIZEOF_SIZE_T
+
+/* The size of `short', as computed by sizeof. */
+#define EVENT__SIZEOF_SHORT 2
+
+/* The size of `void *', as computed by sizeof. */
+#define EVENT__SIZEOF_VOID_P EVENT__SIZEOF_SIZE_T
+
 /* Define to 1 if you have the ANSI C header files. */
 #define EVENT__STDC_HEADERS 1
 
