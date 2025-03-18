@@ -65,6 +65,7 @@ cc_library {
         "-O3",
         "-Wno-strict-aliasing",
         "-Wno-unused-parameter",
+        "-Wno-tautological-compare",
         "-Werror",
     ],
     export_include_dirs: ["include"],
